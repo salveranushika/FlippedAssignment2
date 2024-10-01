@@ -1,16 +1,7 @@
-//
-//  ViewController.swift
-//  AudioLabSwift
-//
-//  Created by Eric Larson 
-//  Copyright © 2020 Eric Larson. All rights reserved.
-//
+
 
 import UIKit
 import Metal
-
-
-
 
 
 class ViewController: UIViewController {
@@ -20,7 +11,7 @@ class ViewController: UIViewController {
         static let AUDIO_BUFFER_SIZE = 1024*4
     }
     
-    // setup audio model
+    // To setup audio model
     let audio = AudioModel(buffer_size: AudioConstants.AUDIO_BUFFER_SIZE)
     lazy var graph:MetalGraph? = {
         return MetalGraph(userView: self.userView)
@@ -29,14 +20,20 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+          
+        userView.frame = CGRect(x: 20, y: 50, width: 365, height: 620) // Example size and position
+            
         
         if let graph = self.graph{
             graph.setBackgroundColor(r: 0, g: 0, b: 0, a: 1)
             
-            // add in graphs for display
-            // note that we need to normalize the scale of this graph
+            // To add in graphs for display
+            // Note: To normalize the scale of this graph
             // because the fft is returned in dB which has very large negative values and some large positive values
             
+            graph.addGraph(withName: "equalizer",
+                            shouldNormalizeForFFT: true,
+                            numPointsInGraph: 20)
             
             graph.addGraph(withName: "fft",
                             shouldNormalizeForFFT: true,
@@ -45,24 +42,40 @@ class ViewController: UIViewController {
             graph.addGraph(withName: "time",
                 numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE)
             
-            
-            
-            graph.makeGrids() // add grids to graph
+            graph.makeGrids() // Adding grids to graph
         }
         
-        // start up the audio model here, querying microphone
-        audio.startMicrophoneProcessing(withFps: 20) // preferred number of FFT calculations per second
-
+        // To Load and start processing the audio file
+        if let fileURL = Bundle.main.url(forResource: "[iSongs.info] 05 - Red Sea", withExtension: "mp3") {
+            print(fileURL)
+            audio.loadAudioFile(url: fileURL)
+        }
+        
+        audio.startAudioFileProcessing(withFps: 60.0) // Process at 60 FPS
         audio.play()
         
-        // run the loop for updating the graph peridocially
+        // Starting up the audio model here, querying microphone
+        // audio.startMicrophoneProcessing(withFps: 20)
+        // preferred number of FFT calculations per second
+
+        // audio.play()
+        
+        // To run the loop for updating the graph peridocially
         Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
             self.updateGraph()
         }
        
     }
     
-    // periodically, update the graph with refreshed FFT Data
+    // To stop audio processing when the view disappears.
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        audio.stop()
+        audio.stopAudioFileProcessing()
+    }
+
+    // To update the graph with refreshed FFT Data
     func updateGraph(){
         
         if let graph = self.graph{
@@ -76,13 +89,13 @@ class ViewController: UIViewController {
                 forKey: "time"
             )
             
-            
-            
+            graph.updateGraph(
+                data: self.audio.twentyPointArray,
+                forKey: "equalizer"
+            )
         }
         
     }
-    
-    
 
 }
 
