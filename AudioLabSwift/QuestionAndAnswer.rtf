@@ -1,0 +1,33 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2818
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;\f2\froman\fcharset0 Times-Roman;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf0 1. If you made the FFT Magnitude Buffer a larger array, would your program still work properly? If yes, why? If not, what would you need to change?
+\f1\b0 \
+	\
+	
+\f2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 The program would still work well if the FFT Magnitude Buffer was a larger array, however some modifications would be necessary. Ultimately, how the FFT is handled determines the frequency resolution and temporal resolution of the audio analysis, which are directly impacted by the size of the FFT buffer. Greater accuracy in frequency detection or finer frequency resolution would result from an increased FFT buffer. However, there would be a decrease in temporal resolution, which would make it harder to detect frequency variations. \outl0\strokewidth0 Furthermore, the logic that processes the buffer would need to be modified if the size of the FFT magnitude buffer was increased. In particular, make sure you manage the analysis's increasing number of frequency bins (e.g., identifying peaks in a
+\f1 \kerning1\expnd0\expndtw0  (e.g. detecting peaks in a larger array).  
+\f2 \expnd0\expndtw0\kerning0
+More processing power will be needed for a larget FFT buffer, which might have an impact on performance. The user will have to carefully manage memory or optimize the frequency at which the FFT is executed. To sum up, the software would still function, but it would require modifications to take into consideration the larget buffer size and how it affects computing performance and frequency resolution. \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1 \cf0 \kerning1\expnd0\expndtw0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b \cf0 2. Is pausing the audioManager object better than deallocating it when the view has disappeared(explain your reasoning)?
+\f1\b0 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 	
+\f2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Generally speaking, when the view disappears, it is better to stop the audioManager object instead of deallocating it. This is better as you can suspend the audioManager and maintain the audio engine's state without constantly reinitializing it when the view disappears. Especially if you think the view will recur frequently (like when you are navigating the program back and forth), this could work better. Because it keeps the audio engine in its current state\'97complete with any processing or setting that is ongoing\'97this is also a better option.  \outl0\strokewidth0 Deallocating it would require recreating the object and restarting the audio engine, which may result in extra overhead.  In conclusion, pausing enables a speedier resume upon the user's return to the screen. When the view returns, deallocating and reinitializing might cause delays that would negatively affect the user experience. However, deallocating the audioManager object would free up memory and resources if you no longer needed it (for instance, if the user had permanently left the audio-related view). However, pausing is a preferable strategy for transient view absence.\
+}
